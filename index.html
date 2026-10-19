@@ -1,0 +1,80 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jarvis AI</title>
+<style>
+body {
+  background: #07111f;
+  color: #e8f7ff;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  padding: 25px 12px;
+}
+h1 { color: #00e5ff; }
+.orb {
+  width: 130px;
+  height: 130px;
+  margin: 30px auto;
+  border: 3px solid #00e5ff;
+  border-radius: 50%;
+  box-shadow: 0 0 30px #00bcd4;
+  display: grid;
+  place-items: center;
+  font-size: 48px;
+}
+button {
+  background: #00cfe8;
+  border: 0;
+  border-radius: 12px;
+  padding: 14px;
+  margin: 7px;
+  font-size: 16px;
+}
+#answer { line-height: 1.6; }
+</style>
+</head>
+<body>
+<h1>JARVIS AI</h1>
+<p>Your personal assistant</p>
+<div class="orb">🤖</div>
+<button onclick="greet()">Greet me</button>
+<button onclick="tellTime()">Tell me the time</button>
+<button onclick="listen()">Voice command 🎙️</button>
+<p id="answer">Hello buddy! I am Jarvis.</p>
+<script>
+function say(message) {
+  document.getElementById("answer").textContent = message;
+  if ("speechSynthesis" in window) {
+    speechSynthesis.cancel();
+    speechSynthesis.speak(new SpeechSynthesisUtterance(message));
+  }
+}
+function greet() {
+  say("Hello buddy! I am Jarvis, your personal assistant.");
+}
+function tellTime() {
+  say("The time is " + new Date().toLocaleTimeString());
+}
+function listen() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    say("Voice recognition is not supported in this browser.");
+    return;
+  }
+  const recognition = new SR();
+  recognition.lang = "en-IN";
+  recognition.onresult = event => {
+    const command = event.results[0][0].transcript.toLowerCase();
+    if (command.includes("hello")) greet();
+    else if (command.includes("time")) tellTime();
+    else say("You said: " + command);
+  };
+  recognition.onerror = () => say("Please try speaking again.");
+  recognition.start();
+}
+</script>
+</body>
+</html>
